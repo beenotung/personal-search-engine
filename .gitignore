@@ -12,3 +12,4 @@ coverage/
 .husky/_
 .nyc_output
 coverage/
+.last
