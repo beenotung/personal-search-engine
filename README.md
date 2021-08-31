@@ -1,5 +1,5 @@
 # personal-search-engine
 
-TODO: add desc
+## TODO
 
-[![npm Package Version](https://img.shields.io/npm/v/personal-search-engine.svg?maxAge=3600)](https://www.npmjs.com/package/personal-search-engine)
+- [ ] normalize high frequent fields to save disk space

@@ -1,0 +1,18 @@
+page
+-
+id pk
+url text
+title text
+text text
+
+# e.g. <meta name="title" content="...">
+# e.g. <meta name="description" content="...">
+# e.g. <meta property="og:video:tag" content="...">
+# e.g. <meta itemprop="genre" content="Music">
+
+meta
+-
+page_id fk >- page.id
+type text # name | property | itemprop
+key text
+content text
