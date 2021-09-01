@@ -55,10 +55,13 @@
       return meta
     })
 
+  let body = document.createElement('body')
+  body.innerHTML = document.body.innerHTML
+
   skipSelectorList.forEach(tag =>
-    document.querySelectorAll(tag).forEach(e => e.remove()),
+    body.querySelectorAll(tag).forEach(e => e.remove()),
   )
-  document.querySelectorAll('body *').forEach(e => {
+  body.querySelectorAll('*').forEach(e => {
     let styles = getComputedStyle(e)
     if (styles.display === 'none') {
       e.remove()
@@ -75,7 +78,7 @@
   })
   let text = Array.from(
     new Set(
-      document.body.textContent
+      body.textContent
         .split('\n')
         .map(line => line.trim())
         .filter(line => line),
