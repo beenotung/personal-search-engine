@@ -131,6 +131,7 @@
   }
 
   let lastUrl
+  let lastTitle
 
   function wait(acc, url) {
     if (location.href !== url) {
@@ -148,8 +149,9 @@
   }
 
   function start(event) {
-    if (lastUrl === location.href) return
+    if (lastUrl === location.href && lastTitle === document.title) return
     lastUrl = location.href
+    lastTitle = document.title
     console.log('start from:', event)
     wait(20, lastUrl)
   }
