@@ -37,23 +37,30 @@
     return 0
   }
 
+  let initialUrl = location.href
+
   function main() {
     let meta_list = []
-    document.querySelectorAll('meta[content]').forEach((meta, index) => {
-      attr: for (let i = 0; i < meta.attributes.length; i++) {
-        let attr = meta.attributes.item(i)
-        if (attr.nodeName === 'content') continue
-        let key = attr.nodeValue
-        for (let skipName of skipMetaNameList) {
-          if (key.match(skipName)) {
-            continue attr
+    document
+      .querySelectorAll(
+        // the meta in body of youtube won't update when switching to other videos with client-side routing
+        location.href === initialUrl ? 'meta[content]' : 'body meta[content]',
+      )
+      .forEach((meta, index) => {
+        attr: for (let i = 0; i < meta.attributes.length; i++) {
+          let attr = meta.attributes.item(i)
+          if (attr.nodeName === 'content') continue
+          let key = attr.nodeValue
+          for (let skipName of skipMetaNameList) {
+            if (key.match(skipName)) {
+              continue attr
+            }
           }
+          let type = attr.nodeName
+          let value = meta.attributes.getNamedItem('content').nodeValue
+          meta_list.push({ index, type, key, value })
         }
-        let type = attr.nodeName
-        let value = meta.attributes.getNamedItem('content').nodeValue
-        meta_list.push({ index, type, key, value })
-      }
-    })
+      })
     meta_list = meta_list
       .sort((a, b) => compare(a.value, b.value) || compare(a.index, b.index))
       .filter((x, i, xs) => i === 0 || x.value !== xs[i - 1].value)
