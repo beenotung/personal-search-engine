@@ -1,28 +1,40 @@
 import express from 'express'
 import cors from 'cors'
 import { print } from 'listening-on'
-import { Raw } from './models'
-import { storePage } from './service'
-let pkg = require('../package.json')
+import { Userscript } from './models'
+import { getPageCount, storePage } from './service'
+import { filterPage } from './controller'
+const pkg = require('../package.json')
 
-let app = express()
+const app = express()
 
 app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.json({ name: pkg.name, version: pkg.version })
+  res.json({
+    name: pkg.name,
+    version: pkg.version,
+    page_count: getPageCount(),
+  })
 })
 
 app.post('/page', (req, res) => {
-  let page = req.body as Raw.Page
-  console.log('storing page:', page.url)
+  const page = req.body.page as Userscript.Page
+  const result = filterPage(page)
+  if (result === 'skip') {
+    console.log('skip page:', page.url)
+    res.json('skipped')
+    return
+  }
+  console.log('store page:', page.url)
   storePage(page)
-  console.log('stored page:', page.url)
-  res.json('ok')
+  res.json('stored')
 })
 
-let PORT = +process.env || 8090
+app.use(express.static('public'))
+
+const PORT = +process.env || 8090
 app.listen(PORT, () => {
   print(PORT)
 })

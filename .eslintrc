@@ -11,8 +11,9 @@
     "spaced-comment": ["error", "always", { "markers": ["/"] }],
     "curly": ["error", "multi-line"],
     "guard-for-in": "error",
+    "@typescript-eslint/no-var-requires": "off",
     "no-console": [
-      "error",
+      "off",
       {
         "allow": ["warn", "debug", "error"]
       }

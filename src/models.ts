@@ -16,7 +16,7 @@ export namespace DB {
   }
 }
 
-export namespace Raw {
+export namespace Userscript {
   export type Page = {
     url: string
     title: string
