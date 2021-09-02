@@ -3,7 +3,7 @@ import { getPageCount, searchPage } from './service'
 const pkg = require('../package.json')
 const { name, version } = pkg
 
-let template = ({
+const template = ({
   title,
   body,
 }: {
@@ -26,7 +26,7 @@ let template = ({
 
 export function renderSearchPage(keyword?: any) {
   const pages = typeof keyword === 'string' ? searchPage(keyword) : null
-  let title = pages ? 'Search: ' + keyword : 'Personal Search Engine'
+  const title = pages ? 'Search: ' + keyword : 'Personal Search Engine'
   let body = /* html */ `
 <h1>${name} v${version}</h1>
 <p>total page count: ${getPageCount()}</p>
@@ -47,7 +47,7 @@ export function renderSearchPage(keyword?: any) {
 `
 
   if (pages) {
-    body += /* html */`
+    body += /* html */ `
 <style>
 li {
     margin-bottom: 0.5em;
