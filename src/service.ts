@@ -58,5 +58,6 @@ export function searchPage(keyword: string) {
     bindings.push(binding)
     bindings.push(binding)
   })
+  sql+=` order by timestamp desc`
   return db.prepare(sql).all(...bindings)
 }
