@@ -134,6 +134,9 @@
 
   function wait(acc, url) {
     if (location.href !== url) {
+      // call start() just in case popstate and hashchange is not triggered
+      // e.g. when switch video in youtube
+      start()
       return
     }
     // console.log('wait:', acc)
