@@ -2,9 +2,9 @@ import express from 'express'
 import cors from 'cors'
 import { print } from 'listening-on'
 import { Userscript } from './models'
-import { getPageCount, storePage } from './service'
+import { storePage } from './service'
 import { filterPage } from './controller'
-const pkg = require('../package.json')
+import { renderSearchPage } from './view'
 
 const app = express()
 
@@ -12,11 +12,11 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.json({
-    name: pkg.name,
-    version: pkg.version,
-    page_count: getPageCount(),
-  })
+  res.end(renderSearchPage())
+})
+
+app.get('/search', (req, res) => {
+  res.end(renderSearchPage(req.query.q))
 })
 
 app.post('/page', (req, res) => {

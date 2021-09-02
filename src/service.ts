@@ -44,3 +44,19 @@ const select_page_count = db.prepare(`select count(*) as count from page`)
 export function getPageCount() {
   return select_page_count.get().count
 }
+
+export function searchPage(keyword: string) {
+  const keywordList = keyword.split(',').map(keyword => keyword.trim())
+  let sql = `select id, url, title from page`
+  if (keywordList.length > 0) {
+    sql += ' where false'
+  }
+  const bindings: string[] = []
+  keywordList.forEach(keyword => {
+    sql += ` or title like ? or text like ?`
+    const binding = `%${keyword}%`
+    bindings.push(binding)
+    bindings.push(binding)
+  })
+  return db.prepare(sql).all(...bindings)
+}
