@@ -48,16 +48,17 @@ export function getPageCount() {
 export function searchPage(keyword: string) {
   const keywordList = keyword.split(',').map(keyword => keyword.trim())
   let sql = `select id, url, title from page`
-  if (keywordList.length > 0) {
-    sql += ' where false'
-  }
   const bindings: string[] = []
-  keywordList.forEach(keyword => {
-    sql += ` or title like ? or text like ?`
-    const binding = `%${keyword}%`
-    bindings.push(binding)
-    bindings.push(binding)
-  })
-  sql+=` order by timestamp desc`
+  if (keywordList.length > 0) {
+    sql += ' where (false'
+    keywordList.forEach(keyword => {
+      sql += ` or title like ? or text like ?`
+      const binding = `%${keyword}%`
+      bindings.push(binding)
+      bindings.push(binding)
+    })
+    sql += `) and not (url glob 'http://localhost:8090/*' or url glob 'http://127\.0\.0\.1:8090/*')`
+  }
+  sql += ` order by timestamp desc`
   return db.prepare(sql).all(...bindings)
 }
