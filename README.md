@@ -1,5 +1,10 @@
 # personal-search-engine
 
+## Feature
+- your search queries never leave your own device
+- personalized data sample
+- you have full control over the database and searching logics
+
 ## Installation
 1. Install the server
 ```bash
@@ -11,9 +16,11 @@ npm install    # or pnpm install
 (Copy `src/userscript.js` into tampermoney script editor, and setup it to run only on top-level frame.)
 
 ## Start Data Collection
+1. Start the server
 ```bash
 npm run dev
 ```
+2. Surf the internet with your browser, the visited pages are collected in the local search engine automatically.
 
 ## Searching
 1. Go to http://localhost:8090
