@@ -32,3 +32,4 @@ You can also select and delete the pages in batch.
 
 - [ ] normalize high frequent fields to save disk space
 - [ ] allow multiple search logics (and, or, not, brackets)
+- [ ] implement TF-IDF
