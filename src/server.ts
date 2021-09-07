@@ -34,7 +34,7 @@ app.post('/page', (req, res) => {
 })
 
 app.post('/delete', (req, res) => {
-  let page_id_list = Object.keys(req.body)
+  const page_id_list = Object.keys(req.body)
   console.log('delete pages:', page_id_list)
   deletePages(page_id_list)
   res.redirect('/')

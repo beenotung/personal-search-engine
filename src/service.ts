@@ -65,7 +65,7 @@ export function searchPage(keyword: string) {
 
 export let deletePages = (page_id_list: string[]) => {
   page_id_list.forEach(page_id => {
-    let selector = { page_id }
+    const selector = { page_id }
     delete_page_meta.run(selector)
     delete_page.run(selector)
   })
