@@ -13,7 +13,7 @@
  * query_expr = bracket_or_expr
  */
 
-export function parseQueryExpr(keywords: string) {
+export function parseQueryExpr(keywords: string): QueryExpr {
   type ParseItem = Token | QueryExpr
   const tokens: ParseItem[] = tokenize(keywords)
 
@@ -127,6 +127,7 @@ export type Symbol = { type: 'symbol'; value: string }
 export type Token = Word | Symbol
 
 export function tokenize(keywords: string): Token[] {
+  type ParseItem = Token
   let tokens: Token[] = [{ type: 'word', value: keywords }]
   symbol_list.forEach(symbol => {
     const acc: Token[] = []

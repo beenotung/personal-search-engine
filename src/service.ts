@@ -1,5 +1,10 @@
 import { Userscript, DB } from './models'
 import { db } from './db'
+import { parseQueryExpr, QueryExpr } from './parse'
+import debug from 'debug'
+import { inspect } from 'util'
+const log = debug('search-engine:server.ts')
+log.enabled = true
 
 const select_page_id = db.prepare(
   `select id as page_id from page where url = ?`,
@@ -45,22 +50,82 @@ export function getPageCount() {
   return select_page_count.get().count
 }
 
-export function searchPage(keyword: string) {
-  const keywordList = keyword.split(',').map(keyword => keyword.trim())
-  let sql = `select id, url, title from page`
-  const bindings: string[] = []
-  if (keywordList.length > 0) {
-    sql += ' where (false'
-    keywordList.forEach(keyword => {
-      sql += ` or title like ? or text like ?`
-      const binding = `%${keyword}%`
-      bindings.push(binding)
-      bindings.push(binding)
-    })
-    sql += `) and not (url glob 'http://localhost:8090/*' or url glob 'http://127\.0\.0\.1:8090/*')`
+type QueryPart = {
+  sql: string
+  bindings: string[]
+}
+function combineQueryPart(a: QueryPart, b: QueryPart): QueryPart {
+  return {
+    sql: a.sql + ' ' + b.sql,
+    bindings: [...a.bindings, ...b.bindings],
   }
-  sql += ` order by timestamp desc`
-  return db.prepare(sql).all(...bindings)
+}
+export function searchPage(keywords: string) {
+  keywords = keywords.trim()
+  log('[searchPage] keywords:', keywords)
+
+  let rootPart: QueryPart = {
+    sql: `select id, url, title from page`,
+    bindings: [],
+  }
+  if (keywords.length > 0) {
+    function toPart(expr: QueryExpr): QueryPart {
+      switch (expr.type) {
+        case 'word': {
+          const keyword: string = expr.value
+          const sql = `title like ? or text like ?`
+          const binding = `%${keyword}%`
+          const bindings = [binding, binding]
+          return { sql, bindings }
+        }
+        case 'symbol': {
+          throw new Error(
+            `invalid query, encountered not parsed symbol ${JSON.stringify(
+              expr.value,
+            )}`,
+          )
+        }
+        case 'and': {
+          const left = toPart(expr.value.left)
+          const right = toPart(expr.value.right)
+          return {
+            sql: `(${left.sql}) and (${right.sql})`,
+            bindings: [...left.bindings, ...right.bindings],
+          }
+        }
+        case 'or': {
+          const left = toPart(expr.value.left)
+          const right = toPart(expr.value.right)
+          return {
+            sql: `(${left.sql}) or (${right.sql})`,
+            bindings: [...left.bindings, ...right.bindings],
+          }
+        }
+        case 'not': {
+          const part = toPart(expr.value)
+          return {
+            sql: `not (${part.sql})`,
+            bindings: part.bindings,
+          }
+        }
+        default: {
+          const x: never = expr
+          throw new Error(
+            `unknown query expression: ${JSON.stringify(
+              (x as QueryExpr).type,
+            )}`,
+          )
+        }
+      }
+    }
+    const queryExpr = parseQueryExpr(keywords)
+    log('[searchPage] query expression:', inspect(queryExpr, { depth: 20 }))
+    const queryPart = toPart(queryExpr)
+    queryPart.sql = `where not (url glob 'http://localhost:8090/*' or url glob 'http://127\.0\.0\.1:8090/*') and (${queryPart.sql})`
+    rootPart = combineQueryPart(rootPart, queryPart)
+  }
+  rootPart.sql += ` order by timestamp desc`
+  return db.prepare(rootPart.sql).all(...rootPart.bindings)
 }
 
 export let deletePages = (page_id_list: string[]) => {
