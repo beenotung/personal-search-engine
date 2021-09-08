@@ -17,8 +17,11 @@ export function filterPage(page: Filter.Page): FilterPageResult {
     const skipKeyList = ['newwindow', 'sxsrf', 'ei', 'gs_lcp', 'ved']
     skipKeyList.forEach(key => url.searchParams.delete(key))
     url.search = url.searchParams.toString()
-    page.url = url.toString()
-    return 'change'
+    const newUrl = url.toString()
+    if (page.url !== newUrl) {
+      page.url = newUrl
+      return 'change'
+    }
   }
   return 'store'
 }
