@@ -7,7 +7,8 @@
  * and_expr = not_expr , { [ "+" ] , not_expr }
  * or_expr = and_expr , { "," , and_expr }
  * bracket_expr = "(" , bracket_expr , ")" | or_expr
- * bracket_and_expr = bracket_expr , { "+" , bracket_expr }
+ * not_bracket_expr = [ "-" ] , bracket_expr
+ * bracket_and_expr = not_bracket_expr , { "+" , not_bracket_expr }
  * bracket_or_expr = bracket_and_expr , { "," , bracket_and_expr }
  * query_expr = bracket_or_expr
  */
@@ -71,6 +72,17 @@ export function parseQueryExpr(keywords: string) {
     const right = tokens[i + 1]
     if (left.value === '(' && right.value === ')') {
       tokens.splice(i - 1, 3, token)
+      i -= 1
+    }
+  }
+
+  // not_bracket_expr
+  for (let i = 1; i < tokens.length; i++) {
+    const left = tokens[i - 1]
+    let token = tokens[i]
+    if (left.value === '-' && token.type !== 'symbol') {
+      token = { type: 'not', value: token }
+      tokens.splice(i - 1, 2, token)
       i -= 1
     }
   }
