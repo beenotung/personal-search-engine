@@ -3,11 +3,12 @@
  *
  * char = letter | digit | chinese
  * word = char , { char }
- * and_expr = word , { "+" , and_expr }
- * or_expr = and_expr , { "," , or_expr }
+ * not_expr = [ "-" ] , word
+ * and_expr = not_expr , { [ "+" ] , not_expr }
+ * or_expr = and_expr , { "," , and_expr }
  * bracket_expr = "(" , bracket_expr , ")" | or_expr
- * bracket_and_expr = bracket_expr , { "+" , bracket_and_expr }
- * bracket_or_expr = bracket_and_expr , { "," , bracket_or_expr }
+ * bracket_and_expr = bracket_expr , { "+" , bracket_expr }
+ * bracket_or_expr = bracket_and_expr , { "," , bracket_and_expr }
  * query_expr = bracket_or_expr
  */
 
@@ -15,18 +16,34 @@ export function parseQueryExpr(keywords: string) {
   type ParseItem = Token | QueryExpr
   const tokens: ParseItem[] = tokenize(keywords)
 
+  // not_expr
+  for (let i = 1; i < tokens.length; i++) {
+    const left = tokens[i - 1]
+    let token = tokens[i]
+    if (left.value === '-' && token.type === 'word') {
+      token = { type: 'not', value: token }
+      tokens.splice(i - 1, 2, token)
+      i -= 1
+    }
+  }
+
   // and_expr
-  for (let i = 1; i < tokens.length - 1; i++) {
+  for (let i = 1; i < tokens.length; i++) {
     const left = tokens[i - 1]
     let token = tokens[i]
     const right = tokens[i + 1]
     if (
+      right &&
       token.value === '+' &&
       left.type !== 'symbol' &&
       right.type !== 'symbol'
     ) {
       token = { type: 'and', value: { left, right } }
       tokens.splice(i - 1, 3, token)
+      i -= 1
+    } else if (token.type === 'not' && left.type !== 'symbol') {
+      token = { type: 'and', value: { left, right: token } }
+      tokens.splice(i - 1, 2, token)
       i -= 1
     }
   }
@@ -84,13 +101,14 @@ export function parseQueryExpr(keywords: string) {
 
   if (tokens.length !== 1) {
     console.error('expect 1 token, got ' + tokens.length)
-    console.error('token:', tokens)
+    console.error('tokens:', tokens)
+    console.error('keywords:', keywords)
     throw new Error('not fully parsed token stream')
   }
   return tokens[0]
 }
 
-const symbol_list = `+,()`.split('')
+const symbol_list = `+,()-`.split('')
 
 export type Word = { type: 'word'; value: string }
 export type Symbol = { type: 'symbol'; value: string }
@@ -127,5 +145,6 @@ export type Term =
   | Token
   | { type: 'and'; value: { left: Term; right: Term } }
   | { type: 'or'; value: { left: Term; right: Term } }
+  | { type: 'not'; value: Term }
 
 export type QueryExpr = Term

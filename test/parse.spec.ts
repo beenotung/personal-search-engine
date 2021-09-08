@@ -28,6 +28,15 @@ describe('parse spec', () => {
     it('should tokenize "bracket expression"', () => {
       test('( a , b ) + c', `(a,b)+c`.split(''))
     })
+    it('should parse "not expression', () => {
+      test('react + typescript - redux', [
+        'react',
+        '+',
+        'typescript',
+        '-',
+        'redux',
+      ])
+    })
   })
 
   context('parseQueryExpr()', () => {
@@ -107,6 +116,68 @@ describe('parse spec', () => {
               left: { type: 'word', value: 'tree' },
               right: { type: 'word', value: 'pie' },
             },
+          },
+        },
+      })
+    })
+    it('should parse "not expression"', () => {
+      expect(parseQueryExpr('-react')).deep.equals({
+        type: 'not',
+        value: { type: 'word', value: 'react' },
+      })
+    })
+    it('should parse "not expresion" and "and expression"', () => {
+      expect(parseQueryExpr('-react+typescript')).deep.equals({
+        type: 'and',
+        value: {
+          left: { type: 'not', value: { type: 'word', value: 'react' } },
+          right: { type: 'word', value: 'typescript' },
+        },
+      })
+      expect(parseQueryExpr('typescript-react')).deep.equals({
+        type: 'and',
+        value: {
+          left: { type: 'word', value: 'typescript' },
+          right: { type: 'not', value: { type: 'word', value: 'react' } },
+        },
+      })
+    })
+    it('should parse "not expresion" and "or expression"', () => {
+      expect(parseQueryExpr('-react,typescript')).deep.equals({
+        type: 'or',
+        value: {
+          left: { type: 'not', value: { type: 'word', value: 'react' } },
+          right: { type: 'word', value: 'typescript' },
+        },
+      })
+      expect(parseQueryExpr('typescript,-react')).deep.equals({
+        type: 'or',
+        value: {
+          left: { type: 'word', value: 'typescript' },
+          right: { type: 'not', value: { type: 'word', value: 'react' } },
+        },
+      })
+    })
+    it('should parse "not expression" with "and expression" in "bracket expression"', () => {
+      expect(parseQueryExpr('-(react+typescript)')).deep.equals({
+        type: 'not',
+        value: {
+          type: 'and',
+          value: {
+            left: { type: 'word', value: 'react' },
+            right: { type: 'word', value: 'typescript' },
+          },
+        },
+      })
+    })
+    it('should parse "not expression" with "or expression" in "bracket expression"', () => {
+      expect(parseQueryExpr('-(react,typescript)')).deep.equals({
+        type: 'not',
+        value: {
+          type: 'or',
+          value: {
+            left: { type: 'word', value: 'react' },
+            right: { type: 'word', value: 'typescript' },
           },
         },
       })
