@@ -121,13 +121,19 @@
       url,
       text_length: text.length,
     })
-    fetch('http://localhost:8090/page', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ page }),
-    })
+    function upload() {
+      fetch('http://localhost:8090/page', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ page }),
+      }).catch(error => {
+        console.error('failed to post page:', error)
+        requestIdleCallback(upload)
+      })
+    }
+    requestIdleCallback(upload)
   }
 
   let lastUrl
