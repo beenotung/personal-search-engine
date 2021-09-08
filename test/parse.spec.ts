@@ -126,7 +126,7 @@ describe('parse spec', () => {
         value: { type: 'word', value: 'react' },
       })
     })
-    it('should parse "not expresion" and "and expression"', () => {
+    it('should parse "not expression" and "and expression"', () => {
       expect(parseQueryExpr('-react+typescript')).deep.equals({
         type: 'and',
         value: {
@@ -142,7 +142,7 @@ describe('parse spec', () => {
         },
       })
     })
-    it('should parse "not expresion" and "or expression"', () => {
+    it('should parse "not expression" and "or expression"', () => {
       expect(parseQueryExpr('-react,typescript')).deep.equals({
         type: 'or',
         value: {
@@ -158,7 +158,7 @@ describe('parse spec', () => {
         },
       })
     })
-    it('should parse "not expression" with "and expression" in "bracket expression"', () => {
+    it('should parse "not expression" on "and expression" in "bracket expression"', () => {
       expect(parseQueryExpr('-(react+typescript)')).deep.equals({
         type: 'not',
         value: {
@@ -170,7 +170,7 @@ describe('parse spec', () => {
         },
       })
     })
-    it('should parse "not expression" with "or expression" in "bracket expression"', () => {
+    it('should parse "not expression" on "or expression" in "bracket expression"', () => {
       expect(parseQueryExpr('-(react,typescript)')).deep.equals({
         type: 'not',
         value: {
