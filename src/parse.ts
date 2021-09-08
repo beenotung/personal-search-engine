@@ -127,7 +127,6 @@ export type Symbol = { type: 'symbol'; value: string }
 export type Token = Word | Symbol
 
 export function tokenize(keywords: string): Token[] {
-  type ParseItem = Token
   let tokens: Token[] = [{ type: 'word', value: keywords }]
   symbol_list.forEach(symbol => {
     const acc: Token[] = []
