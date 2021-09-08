@@ -3,7 +3,8 @@ import { db } from './db'
 import { parseQueryExpr, QueryExpr } from './parse'
 import debug from 'debug'
 import { inspect } from 'util'
-const log = debug('search-engine:server.ts')
+
+const log = debug('search-engine:service.ts')
 log.enabled = true
 
 const select_page_id = db.prepare(
