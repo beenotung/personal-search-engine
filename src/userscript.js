@@ -130,7 +130,9 @@
         body: JSON.stringify({ page }),
       }).catch(error => {
         console.error('failed to post page:', error)
-        requestIdleCallback(upload)
+        setTimeout(() => {
+          requestIdleCallback(upload)
+        }, 5000)
       })
     }
     requestIdleCallback(upload)
