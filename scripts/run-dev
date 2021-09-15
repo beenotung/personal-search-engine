@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+set -o pipefail
+if [ ! -d node_modules ]; then
+  pnpm i
+fi
+npm run dev

@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+set -o pipefail
+cd "$(dirname "$(dirname "$0")")"
+tmux new -dP -s search-daemon './scripts/run-dev' || true
