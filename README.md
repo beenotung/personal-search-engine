@@ -1,5 +1,7 @@
 # personal-search-engine
 
+A home-grow search engine for individual
+
 ## Feature
 
 - Your search queries never leave your own device
