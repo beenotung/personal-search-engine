@@ -8,6 +8,7 @@ A home-grown search engine for individual
 - Personalized data sample
 - You have full control over the database and searching logics
 - Support multiple search logics (and, or, not, brackets)
+- No 3rd-party tracker nor pushed advertisement
 
 ## Installation
 
