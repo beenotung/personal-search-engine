@@ -2,9 +2,10 @@
 
 ## Feature
 
-- your search queries never leave your own device
-- personalized data sample
-- you have full control over the database and searching logics
+- Your search queries never leave your own device
+- Personalized data sample
+- You have full control over the database and searching logics
+- Support multiple search logics (and, or, not, brackets)
 
 ## Installation
 
@@ -39,5 +40,4 @@ npm run dev
 ## TODO
 
 - [ ] normalize high frequent fields to save disk space
-- [ ] allow multiple search logics (and, or, not, brackets)
 - [ ] implement TF-IDF
