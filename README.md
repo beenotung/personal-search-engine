@@ -1,6 +1,6 @@
 # personal-search-engine
 
-A home-grow search engine for individual
+A home-grown search engine for individual
 
 ## Feature
 
