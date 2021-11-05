@@ -24,7 +24,7 @@ npm install    # or pnpm install
 1. Start the server
 
 ```bash
-npm run dev
+npm start
 ```
 
 2. Surf the internet with your browser, the visited pages are collected in the local search engine automatically.

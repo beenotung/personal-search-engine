@@ -10,6 +10,7 @@
   "module": "dist/esm/index.js",
   "sideEffects": false,
   "scripts": {
+    "start": "ts-node-transpile-only src/server.ts",
     "dev": "ts-node-dev src/server.ts",
     "prepare": "run-p prepare:*",
     "prepare:husky": "husky install",
