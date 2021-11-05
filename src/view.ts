@@ -53,7 +53,8 @@ export function renderSearchPage(keyword?: any) {
 </form>
 `
 
-  if (pages) {
+  if (pages && pages.length > 0) {
+    const padding = pages[0].id.toString().length / 2 + 1
     body += /* html */ `
 <style>
 #search-form {
@@ -99,7 +100,7 @@ function checkAll(checked) {
     <button onclick="checkAll(false); return false">Unselect All</button>
     <input type="submit" value="Delete Selected" style="background: black; color: white">
   </div>
-  <ol>`
+  <ol style="padding-inline-start: ${padding}em">`
     pages.forEach(page => {
       body += /* html */ `
     <li value="${page.id}">
