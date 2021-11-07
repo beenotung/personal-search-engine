@@ -30,6 +30,28 @@
     ],
     [/https:\/\/www\.youtube\.com\/watch\?/, ['.playlist-items', '#related']],
   ]
+  let skipParamNameList = [
+    'utm_source',
+    'utm_medium',
+    'utm_campaign',
+    // 'utm_term',
+    'utm_content',
+  ]
+  function getCurrentUrl() {
+    let search = location.search
+    if (search && skipParamNameList.some(name => search.includes(name))) {
+      let params = new URLSearchParams(search)
+      skipParamNameList.forEach(name => params.delete(name))
+      return (
+        location.origin +
+        location.pathname +
+        '?' +
+        params.toString() +
+        location.hash
+      )
+    }
+    return location.href
+  }
 
   function compare(a, b) {
     if (a < b) return -1
@@ -109,7 +131,7 @@
     ).join('\n')
 
     let title = document.title
-    let url = location.href
+    let url = getCurrentUrl()
     let page = {
       url,
       title,
