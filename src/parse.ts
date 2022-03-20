@@ -1,168 +1,17 @@
 /**
- * # EBNF
+ * EBNF:
  *
  * char = letter | digit | chinese
- * word = char , { char }
- * not_expr = [ "-" ] , word
- * and_expr = not_expr , { [ "+" ] , not_expr }
- * or_expr = and_expr , { "," , and_expr }
- * bracket_expr = "(" , bracket_expr , ")" | or_expr
+ * word = char, { char }
+ * not_word_expr = [ "-" ] , word
+ * and_or_expr = { not_word_expr , ( "+" | "," ) } , not_word_expr
+ * bracket_expr = "(" , and_or_expr , ")" | and_or_expr
  * not_bracket_expr = [ "-" ] , bracket_expr
- * bracket_and_expr = not_bracket_expr , { "+" , not_bracket_expr }
- * bracket_or_expr = bracket_and_expr , { "," , bracket_and_expr }
- * query_expr = bracket_or_expr
+ * and_or_bracket_expr = { not_bracket_expr , ( "+" | "," ) } , not_bracket_expr
+ * query_expr = and_or_bracket_expr
  */
 
-export function parseQueryExpr(keywords: string): QueryExpr {
-  type ParseItem = Token | QueryExpr
-  const tokens: ParseItem[] = tokenize(keywords)
-
-  // not_expr
-  for (let i = 1; i < tokens.length; i++) {
-    const left = tokens[i - 1]
-    let token = tokens[i]
-    if (left.value === '-' && token.type === 'word') {
-      token = { type: 'not', value: token }
-      tokens.splice(i - 1, 2, token)
-      i -= 1
-    }
-  }
-
-  // and_expr
-  for (let i = 1; i < tokens.length; i++) {
-    const left = tokens[i - 1]
-    let token = tokens[i]
-    const right = tokens[i + 1]
-    if (
-      right &&
-      token.value === '+' &&
-      left.type !== 'symbol' &&
-      right.type !== 'symbol'
-    ) {
-      token = { type: 'and', value: { left, right } }
-      tokens.splice(i - 1, 3, token)
-      i -= 1
-    } else if (token.type === 'not' && left.type !== 'symbol') {
-      token = { type: 'and', value: { left, right: token } }
-      tokens.splice(i - 1, 2, token)
-      i -= 1
-    }
-  }
-
-  // or_expr
-  for (let i = 1; i < tokens.length - 1; i++) {
-    const left = tokens[i - 1]
-    let token = tokens[i]
-    const right = tokens[i + 1]
-    if (
-      token.value === ',' &&
-      left.type !== 'symbol' &&
-      right.type !== 'symbol'
-    ) {
-      token = { type: 'or', value: { left, right } }
-      tokens.splice(i - 1, 3, token)
-      i -= 1
-    }
-  }
-
-  // bracket_expr
-  for (let i = 1; i < tokens.length - 1; i++) {
-    const left = tokens[i - 1]
-    const token = tokens[i]
-    const right = tokens[i + 1]
-    if (left.value === '(' && right.value === ')') {
-      tokens.splice(i - 1, 3, token)
-      i -= 1
-    }
-  }
-
-  // not_bracket_expr
-  for (let i = 1; i < tokens.length; i++) {
-    const left = tokens[i - 1]
-    let token = tokens[i]
-    if (left.value === '-' && token.type !== 'symbol') {
-      token = { type: 'not', value: token }
-      tokens.splice(i - 1, 2, token)
-      i -= 1
-    }
-  }
-
-  // bracket_and_expr
-  for (let i = 1; i < tokens.length - 1; i++) {
-    const left = tokens[i - 1]
-    let token = tokens[i]
-    const right = tokens[i + 1]
-    if (token.value === '+') {
-      token = { type: 'and', value: { left, right } }
-      tokens.splice(i - 1, 3, token)
-      i -= 1
-    }
-  }
-
-  // bracket_or_expr
-  for (let i = 1; i < tokens.length - 1; i++) {
-    const left = tokens[i - 1]
-    let token = tokens[i]
-    const right = tokens[i + 1]
-    if (token.value === ',') {
-      token = { type: 'or', value: { left, right } }
-      tokens.splice(i - 1, 3, token)
-      i -= 1
-    }
-  }
-
-  while (tokens.length > 1 && tokens[1].type === 'not') {
-    let term: Term = {
-      type: 'and',
-      value: {
-        left: tokens[0],
-        right: tokens[1],
-      },
-    }
-    tokens[0] = term
-    tokens.splice(1, 1)
-  }
-  if (tokens.length !== 1) {
-    console.error('expect 1 token, got ' + tokens.length)
-    console.error('tokens:', tokens)
-    console.error('keywords:', keywords)
-    throw new Error('not fully parsed token stream')
-  }
-  return tokens[0]
-}
-
-const symbol_list = `+,()-`.split('')
-
-export type Word = { type: 'word'; value: string }
-export type Symbol = { type: 'symbol'; value: string }
-export type Token = Word | Symbol
-
-export function tokenize(keywords: string): Token[] {
-  let tokens: Token[] = [{ type: 'word', value: keywords }]
-  symbol_list.forEach(symbol => {
-    const acc: Token[] = []
-    tokens.forEach(token => {
-      if (token.type === 'symbol') {
-        acc.push(token)
-        return
-      }
-      token.value
-        .split(symbol)
-        .forEach(word =>
-          acc.push(
-            { type: 'word', value: word },
-            { type: 'symbol', value: symbol },
-          ),
-        )
-      acc.pop()
-    })
-    tokens = acc
-  })
-  return tokens.filter(token => {
-    token.value = token.value.trim()
-    return token.value.length > 0
-  })
-}
+import { Token, tokenize } from './tokenize'
 
 export type Term =
   | Token
@@ -171,3 +20,186 @@ export type Term =
   | { type: 'not'; value: Term }
 
 export type QueryExpr = Term
+
+// print more detail default message if running mocha test
+function report(object: object) {
+  Object.entries(object).forEach(([name, value]) => {
+    let label = name + ':'
+    if (typeof it === 'undefined') {
+      console.debug(label, value)
+    } else {
+      console.debug('\n' + label)
+      console.dir(value, { depth: 10 })
+    }
+  })
+}
+
+export function parseQueryExpr(keywords: string): QueryExpr {
+  const tokens = tokenize(keywords)
+  let result = parse(tokens, 0)
+  while (result.idx < tokens.length) {
+    let nextResult = parseWithFirst(tokens, result.idx, result.value)
+    if (nextResult.idx === result.idx) {
+      report({
+        keywords,
+        tokens,
+        'parse result': result,
+        rest: tokens.slice(result.idx),
+      })
+      throw new Error('not fully parsed token stream')
+    }
+    result = nextResult
+  }
+  return result.value
+}
+
+type ParseResult = {
+  idx: number
+  value: QueryExpr
+}
+
+function parse(tokens: Token[], idx: number): ParseResult {
+  let first = tokens[idx]
+  if (idx + 1 < tokens.length) {
+    return parseWithFirst(tokens, idx + 1, first)
+  }
+  if (first.type === 'word') {
+    return {
+      idx: idx + 1,
+      value: first,
+    }
+  }
+  report({ tokens, first })
+  throw new Error(`unexpected token: ${JSON.stringify(first)}`)
+}
+
+/* parse bracket */
+function parseWithFirst(
+  tokens: Token[],
+  nextIdx: number,
+  first: QueryExpr,
+): ParseResult {
+  if (first.type === 'symbol' && first.value === '(') {
+    let second = parse(tokens, nextIdx)
+    let third = tokens[second.idx]
+    if (!third || third.type !== 'symbol' || third.value !== ')') {
+      report({
+        tokens,
+        first,
+        second,
+        third,
+      })
+      throw new Error(`missing ')' in "bracket expression"`)
+    }
+    return {
+      idx: second.idx + 1,
+      value: second.value,
+    }
+  }
+  let second = tokens[nextIdx]
+  if (second.type === 'symbol') {
+    switch (second.value) {
+      case '(': {
+        let third = parse(tokens, nextIdx)
+        return parseWithSecond(tokens, third.idx, first, third.value)
+      }
+      case ')':
+        return { idx: nextIdx, value: first }
+    }
+  }
+  return parseWithSecond(tokens, nextIdx + 1, first, second)
+}
+
+function parseNot(
+  tokens: Token[],
+  nextIdx: number,
+  first: QueryExpr,
+): ParseResult {
+  if (first.type === 'symbol' && first.value === '-') {
+    return parse(tokens, nextIdx)
+  }
+  return { idx: nextIdx, value: { type: 'not', value: first } }
+}
+
+function parseWithSecond(
+  tokens: Token[],
+  nextIdx: number,
+  first: QueryExpr,
+  second: QueryExpr,
+): ParseResult {
+  if (first.type === 'symbol' && first.value === '-') {
+    return parseNot(tokens, nextIdx, second)
+  }
+  if (second.type === 'symbol') {
+    switch (second.value) {
+      case '-': {
+        let third = parseWord(tokens, nextIdx)
+        return {
+          idx: third.idx,
+          value: {
+            type: 'and',
+            value: { left: first, right: { type: 'not', value: third.value } },
+          },
+        }
+      }
+      case '+': {
+        let third = parseWord(tokens, nextIdx)
+        return {
+          idx: third.idx,
+          value: {
+            type: 'and',
+            value: { left: first, right: third.value },
+          },
+        }
+      }
+      case ',': {
+        let third = parseWord(tokens, nextIdx)
+        return {
+          idx: third.idx,
+          value: {
+            type: 'or',
+            value: { left: first, right: third.value },
+          },
+        }
+      }
+    }
+  }
+  report({ tokens, first, second })
+  throw new Error(`unexpected token: ${JSON.stringify(first)}`)
+}
+
+function parseWord(tokens: Token[], nextIdx: number): ParseResult {
+  let first = tokens[nextIdx]
+  if (first.type == 'word') {
+    return { idx: nextIdx + 1, value: first }
+  }
+  return parse(tokens, nextIdx)
+}
+
+export function test() {
+  let samples = [
+    'a',
+    '-a',
+    'a+b',
+    'a,b',
+    'a+-b',
+    'a-b',
+    '(a)',
+    'a+(b,c)',
+    '(a+b),c',
+    'a+(b+c)+d',
+    'typescript+(angular,(react-redux))',
+    'a+b,c',
+    '((a))',
+    '--a',
+  ]
+  for (let input of samples) {
+    report({ input })
+    let expr = parseQueryExpr(input)
+    report({ expr })
+  }
+}
+
+if (typeof process !== 'undefined' && process.argv[1] === __filename) {
+  test()
+}

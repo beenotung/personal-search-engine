@@ -1,44 +1,7 @@
 import { expect } from 'chai'
-import { parseQueryExpr, Token, tokenize } from '../src/parse'
+import { parseQueryExpr } from './parse'
 
-describe('parse spec', () => {
-  function toValue(token: Token) {
-    return token.value
-  }
-
-  context('tokenize()', () => {
-    function test(keywords: string, expected: string[]) {
-      expect(tokenize(keywords).map(toValue)).deep.equals(expected)
-    }
-    it('should tokenize word', () => {
-      test('apple', ['apple'])
-    })
-    it('should tokenize word with space', () => {
-      test('apple tree', ['apple tree'])
-    })
-    it('should tokenize "and expression"', () => {
-      test('apple + tree', ['apple', '+', 'tree'])
-    })
-    it('should tokenize "or expression"', () => {
-      test('apple , tree', ['apple', ',', 'tree'])
-    })
-    it('should tokenize "or expression" and "and expression"', () => {
-      test('a , b + c', `a,b+c`.split(''))
-    })
-    it('should tokenize "bracket expression"', () => {
-      test('( a , b ) + c', `(a,b)+c`.split(''))
-    })
-    it('should parse "not expression', () => {
-      test('react + typescript - redux', [
-        'react',
-        '+',
-        'typescript',
-        '-',
-        'redux',
-      ])
-    })
-  })
-
+describe('parse.ts TestSuit', () => {
   context('parseQueryExpr()', () => {
     it('should parse "word expression"', () => {
       expect(parseQueryExpr('apple')).deep.equals({
@@ -79,16 +42,16 @@ describe('parse spec', () => {
         },
       })
       expect(parseQueryExpr('apple,tree+pie')).deep.equals({
-        type: 'or',
+        type: 'and',
         value: {
-          left: { type: 'word', value: 'apple' },
-          right: {
-            type: 'and',
+          left: {
+            type: 'or',
             value: {
-              left: { type: 'word', value: 'tree' },
-              right: { type: 'word', value: 'pie' },
+              left: { type: 'word', value: 'apple' },
+              right: { type: 'word', value: 'tree' },
             },
           },
+          right: { type: 'word', value: 'pie' },
         },
       })
     })
@@ -120,10 +83,62 @@ describe('parse spec', () => {
         },
       })
     })
+    it('should parse extra "bracket expression"', () => {
+      expect(parseQueryExpr('(lisp)')).deep.equals({
+        type: 'word',
+        value: 'lisp',
+      })
+      expect(parseQueryExpr('((lisp))')).deep.equals({
+        type: 'word',
+        value: 'lisp',
+      })
+    })
+    it('should parse nested "bracket expression"', () => {
+      expect(parseQueryExpr('typescript+(angular,(react-redux))')).deep.equals({
+        type: 'and',
+        value: {
+          left: { type: 'word', value: 'typescript' },
+          right: {
+            type: 'or',
+            value: {
+              left: { type: 'word', value: 'angular' },
+              right: {
+                type: 'and',
+                value: {
+                  left: { type: 'word', value: 'react' },
+                  right: {
+                    type: 'not',
+                    value: { type: 'word', value: 'redux' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+    })
     it('should parse "not expression"', () => {
       expect(parseQueryExpr('-react')).deep.equals({
         type: 'not',
         value: { type: 'word', value: 'react' },
+      })
+    })
+    it('should parse double "not expression"', () => {
+      expect(parseQueryExpr('--react')).deep.equals({
+        type: 'word',
+        value: 'react',
+      })
+    })
+    it('should parse triple "not expression"', () => {
+      expect(parseQueryExpr('---react')).deep.equals({
+        type: 'not',
+        value: { type: 'word', value: 'react' },
+      })
+    })
+    it('should parse quadruple "not expression"', () => {
+      expect(parseQueryExpr('----react')).deep.equals({
+        type: 'word',
+        value: 'react',
       })
     })
     it('should parse "not expression" and "and expression"', () => {
