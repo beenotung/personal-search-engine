@@ -111,6 +111,17 @@ export function parseQueryExpr(keywords: string): QueryExpr {
     }
   }
 
+  while (tokens.length > 1 && tokens[1].type === 'not') {
+    let term: Term = {
+      type: 'and',
+      value: {
+        left: tokens[0],
+        right: tokens[1],
+      },
+    }
+    tokens[0] = term
+    tokens.splice(1, 1)
+  }
   if (tokens.length !== 1) {
     console.error('expect 1 token, got ' + tokens.length)
     console.error('tokens:', tokens)

@@ -182,5 +182,47 @@ describe('parse spec', () => {
         },
       })
     })
+    it('should parse "not expression" after "bracket expression"', () => {
+      expect(parseQueryExpr('typescript+react-google search')).deep.equals({
+        type: 'and',
+        value: {
+          left: {
+            type: 'and',
+            value: {
+              left: { type: 'word', value: 'typescript' },
+              right: { type: 'word', value: 'react' },
+            },
+          },
+          right: {
+            type: 'not',
+            value: { type: 'word', value: 'google search' },
+          },
+        },
+      })
+      expect(
+        parseQueryExpr('typescript+(angular,react)-google search'),
+      ).deep.equals({
+        type: 'and',
+        value: {
+          left: {
+            type: 'and',
+            value: {
+              left: { type: 'word', value: 'typescript' },
+              right: {
+                type: 'or',
+                value: {
+                  left: { type: 'word', value: 'angular' },
+                  right: { type: 'word', value: 'react' },
+                },
+              },
+            },
+          },
+          right: {
+            type: 'not',
+            value: { type: 'word', value: 'google search' },
+          },
+        },
+      })
+    })
   })
 })
