@@ -21,7 +21,7 @@ npm install    # or pnpm install
 ```
 
 2. Setup userscript to collect data when you surf the internet
-   (Copy `src/userscript.js` into tampermoney script editor, and setup it to run only on top-level frame.)
+   (Copy `src/userscript.js` into [tampermoney](https://www.tampermonkey.net) script editor, and setup it to run only on top-level frame.)
 
 ## Start Data Collection
 
