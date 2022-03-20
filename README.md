@@ -40,6 +40,27 @@ npm start
 3. The search result will be shown.
    You can also select and delete the pages in batch.
 
+### Search Term
+
+| Operator | Meaning            |
+| -------- | ------------------ |
+| +        | and                |
+| ,        | or                 |
+| -        | not (excluding)    |
+| (        | Opening of a group |
+| )        | Closing of a group |
+
+### Example Queries
+
+When searching with "`react + typescript - redux`", it will search for websites that include "react" and "typescript" but excluding those including "redux".
+
+When searching with "`css module + (angular,react)`", it will treat "css module" as a single term. This query can be used when you want to find websites covering how to apply css module in (angular or react) application.
+The spaces between operators are optional.
+
+One more example, when search with "`typescript-google search`", it will search for websites that mention typescript but excluding google search result pages.
+
+**Remark**: The search terms are case-insensitive
+
 ## TODO
 
 - [ ] normalize high frequent fields to save disk space
