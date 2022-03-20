@@ -42,13 +42,13 @@ npm start
 
 ### Search Term
 
-| Operator | Meaning            |
-| -------- | ------------------ |
-| +        | and                |
-| ,        | or                 |
-| -        | not (excluding)    |
-| (        | Opening of a group |
-| )        | Closing of a group |
+| Symbol | Meaning            |
+| ------ | ------------------ |
+| +      | and                |
+| ,      | or                 |
+| -      | not (excluding)    |
+| (      | Opening of a group |
+| )      | Closing of a group |
 
 ### Example Queries
 
