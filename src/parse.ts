@@ -24,7 +24,7 @@ export type QueryExpr = Term
 // print more detail default message if running mocha test
 function report(object: object) {
   Object.entries(object).forEach(([name, value]) => {
-    let label = name + ':'
+    const label = name + ':'
     if (typeof it === 'undefined') {
       console.debug(label, value)
     } else {
@@ -38,7 +38,7 @@ export function parseQueryExpr(keywords: string): QueryExpr {
   const tokens = tokenize(keywords)
   let result = parse(tokens, 0)
   while (result.idx < tokens.length) {
-    let nextResult = parseWithFirst(tokens, result.idx, result.value)
+    const nextResult = parseWithFirst(tokens, result.idx, result.value)
     if (nextResult.idx === result.idx) {
       report({
         keywords,
@@ -59,7 +59,7 @@ type ParseResult = {
 }
 
 function parse(tokens: Token[], idx: number): ParseResult {
-  let first = tokens[idx]
+  const first = tokens[idx]
   if (idx + 1 < tokens.length) {
     return parseWithFirst(tokens, idx + 1, first)
   }
@@ -80,8 +80,8 @@ function parseWithFirst(
   first: QueryExpr,
 ): ParseResult {
   if (first.type === 'symbol' && first.value === '(') {
-    let second = parse(tokens, nextIdx)
-    let third = tokens[second.idx]
+    const second = parse(tokens, nextIdx)
+    const third = tokens[second.idx]
     if (!third || third.type !== 'symbol' || third.value !== ')') {
       report({
         tokens,
@@ -96,11 +96,11 @@ function parseWithFirst(
       value: second.value,
     }
   }
-  let second = tokens[nextIdx]
+  const second = tokens[nextIdx]
   if (second.type === 'symbol') {
     switch (second.value) {
       case '(': {
-        let third = parse(tokens, nextIdx)
+        const third = parse(tokens, nextIdx)
         return parseWithSecond(tokens, third.idx, first, third.value)
       }
       case ')':
@@ -133,7 +133,7 @@ function parseWithSecond(
   if (second.type === 'symbol') {
     switch (second.value) {
       case '-': {
-        let third = parseWord(tokens, nextIdx)
+        const third = parseWord(tokens, nextIdx)
         return {
           idx: third.idx,
           value: {
@@ -143,7 +143,7 @@ function parseWithSecond(
         }
       }
       case '+': {
-        let third = parseWord(tokens, nextIdx)
+        const third = parseWord(tokens, nextIdx)
         return {
           idx: third.idx,
           value: {
@@ -153,7 +153,7 @@ function parseWithSecond(
         }
       }
       case ',': {
-        let third = parseWord(tokens, nextIdx)
+        const third = parseWord(tokens, nextIdx)
         return {
           idx: third.idx,
           value: {
@@ -169,7 +169,7 @@ function parseWithSecond(
 }
 
 function parseWord(tokens: Token[], nextIdx: number): ParseResult {
-  let first = tokens[nextIdx]
+  const first = tokens[nextIdx]
   if (first.type == 'word') {
     return { idx: nextIdx + 1, value: first }
   }
@@ -177,7 +177,7 @@ function parseWord(tokens: Token[], nextIdx: number): ParseResult {
 }
 
 export function test() {
-  let samples = [
+  const samples = [
     'a',
     '-a',
     'a+b',
@@ -193,9 +193,9 @@ export function test() {
     '((a))',
     '--a',
   ]
-  for (let input of samples) {
+  for (const input of samples) {
     report({ input })
-    let expr = parseQueryExpr(input)
+    const expr = parseQueryExpr(input)
     report({ expr })
   }
 }
