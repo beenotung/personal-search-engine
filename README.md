@@ -9,6 +9,7 @@ A home-grown search engine for individual
 - You have full control over the database and searching logics
 - Support multiple search logics (and, or, not, brackets)
 - No 3rd-party tracking nor pushed advertisement
+- Support dark theme
 
 ## Installation
 

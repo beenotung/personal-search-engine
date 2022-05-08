@@ -58,6 +58,9 @@ export function renderSearchPage(res: Response, keyword?: any) {
     const padding = pages[0].id.toString().length / 2 + 1
     res.write(/* html */ `
 <style>
+body {
+  font-family: Sans-serif;
+}
 #search-form {
   padding: 0.5em 0;
   position: sticky;
@@ -69,6 +72,25 @@ export function renderSearchPage(res: Response, keyword?: any) {
   position: sticky;
   top: 3.5em;
   background-color: white;
+}
+@media (prefers-color-scheme: dark) {
+  body,
+  #search-form,
+  #controls {
+    background-color: black;
+  }
+  body {
+    color: #c7c7c7;
+  }
+  a {
+    color: #eb9595;
+  }
+  a:visited {
+    color: #9ed789;
+  }
+  a:hover {
+    color: #f2d0d0;
+  }
 }
 .title {
   font-size: bolder;
