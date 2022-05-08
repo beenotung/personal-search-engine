@@ -17,11 +17,11 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.get('/', (req, res) => {
-  res.end(renderSearchPage())
+  renderSearchPage(res)
 })
 
 app.get('/search', (req, res) => {
-  res.end(renderSearchPage(req.query.q))
+  renderSearchPage(res, req.query.q)
 })
 
 app.post('/page', (req, res) => {

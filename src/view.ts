@@ -1,16 +1,11 @@
 import { getPageCount, searchPage } from './service'
+import type { Response } from 'express'
 
 const pkg = require('../package.json')
 const { name, version } = pkg
 
-const template = ({
-  title,
-  body,
-}: {
-  title: string
-  body: string
-}) => /* html */ `
-<!DOCTYPE html>
+function startHTML(res: Response, title: string) {
+  res.write(/* html */ `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,15 +14,21 @@ const template = ({
     <title>${title}</title>
 </head>
 <body>
-    ${body}
-</body>
-</html>
-`
+  `)
+}
 
-export function renderSearchPage(keyword?: any) {
+function endHTML(res: Response) {
+  res.write(/* html */ `</body></html>`)
+  res.end()
+}
+
+export function renderSearchPage(res: Response, keyword?: any) {
   const pages = typeof keyword === 'string' ? searchPage(keyword) : null
   const title = pages ? 'Search: ' + keyword : 'Personal Search Engine'
-  let body = /* html */ `
+
+  startHTML(res, title)
+
+  res.write(/* html */ `
 <h1>${name} v${version}</h1>
 <p>total page count: ${getPageCount()}</p>
 
@@ -43,19 +44,19 @@ export function renderSearchPage(keyword?: any) {
       }
   </script>
   <input type='submit' value="Search">
-  `
+  `)
   if (pages) {
-    body += /* html */ `
+    res.write(/* html */ `
   <div>${pages.length.toLocaleString()} matches</div>
-    `
+    `)
   }
-  body += /* html */ `
+  res.write(/* html */ `
 </form>
-`
+`)
 
   if (pages && pages.length > 0) {
     const padding = pages[0].id.toString().length / 2 + 1
-    body += /* html */ `
+    res.write(/* html */ `
 <style>
 #search-form {
   padding: 0.5em 0;
@@ -100,9 +101,9 @@ function checkAll(checked) {
     <button onclick="checkAll(false); return false">Unselect All</button>
     <input type="submit" value="Delete Selected" style="background: black; color: white">
   </div>
-  <ol style="padding-inline-start: ${padding}em">`
+  <ol style="padding-inline-start: ${padding}em">`)
     pages.forEach(page => {
-      body += /* html */ `
+      res.write(/* html */ `
     <li value="${page.id}">
       <div>
         <div class="checkbox-wrapper">
@@ -113,13 +114,12 @@ function checkAll(checked) {
           <a href="${page.url}">${page.url}</a>
         </div>
       </div>
-    </li>`
+    </li>`)
     })
-    body += /* html */ `
+    res.write(/* html */ `
   </ol>
 </form>
-`
+`)
   }
-
-  return template({ title, body })
+  endHTML(res)
 }
