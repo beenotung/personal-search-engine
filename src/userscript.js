@@ -2,7 +2,7 @@
 // @name         personal-search-engine
 // @namespace    http://tampermonkey.net/
 // @version      0.1
-// @description  remove iframe from the page
+// @description  collect website content from daily web surfing
 // @author       Beeno Tung
 // @include      http://*
 // @include      https://*
