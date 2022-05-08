@@ -67,7 +67,7 @@ export function renderSearchPage(res: Response, keyword?: any) {
 #controls {
   padding: 1em 0;
   position: sticky;
-  top: 3em;
+  top: 3.5em;
   background-color: white;
 }
 .title {
