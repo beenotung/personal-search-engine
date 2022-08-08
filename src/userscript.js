@@ -15,6 +15,7 @@
   console.log('personal-search-engine v0.1')
 
   let blockedByCSP = false
+  let retryBackoff = 5000
 
   let skipMetaNameList = ['regionsAllowed', /:url/]
   let urlMatchSkipSelectorList = [
@@ -155,23 +156,28 @@
         body: JSON.stringify({ page }),
       }).catch(error => {
         console.error('failed to post page:', error)
-        fetch('/', { method: 'HEAD' })
-          .then(res => {
-            let policy = res.headers.get('content-security-policy')
-            if (policy && policy.includes('connect-src')) {
-              blockedByCSP = true
-              return
-            }
-          })
-          .catch(error => {
-            console.error('failed to check CSP:', error)
-          })
-          .then(() => {
-            if (blockedByCSP) return
-            setTimeout(() => {
-              requestIdleCallback(upload)
-            }, 5000)
-          })
+        setTimeout(
+          () =>
+            fetch('/', { method: 'HEAD' })
+              .then(res => {
+                let policy = res.headers.get('content-security-policy')
+                if (policy && policy.includes('connect-src')) {
+                  blockedByCSP = true
+                  return
+                }
+              })
+              .catch(error => {
+                console.error('failed to check CSP:', error)
+              })
+              .then(() => {
+                if (blockedByCSP) return
+                setTimeout(() => {
+                  retryBackoff *= 1.5
+                  requestIdleCallback(upload)
+                }, retryBackoff)
+              }),
+          retryBackoff,
+        )
       })
     }
     requestIdleCallback(upload)
