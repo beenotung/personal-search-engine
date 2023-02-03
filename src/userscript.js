@@ -47,6 +47,7 @@
     // 'utm_term',
     'utm_content',
   ]
+
   function getCurrentUrl() {
     let search = location.search
     if (search && skipParamNameList.some(name => search.includes(name))) {
