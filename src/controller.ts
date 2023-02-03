@@ -9,7 +9,7 @@ export namespace Filter {
 export type FilterPageResult = 'skip' | 'store' | 'change'
 
 export function filterPage(page: Filter.Page): FilterPageResult {
-  if (page.url.match(/^http[s]*:\/\/sso\./)) {
+  if (page.url.match(/^http[s]?:\/\/(sso|account[s]?)\./)) {
     return 'skip'
   }
   if (page.url.startsWith('https://www.google.com/search?')) {
