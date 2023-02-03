@@ -14,6 +14,13 @@
 
   console.log('personal-search-engine v0.1')
 
+  let api_origin = 'http://localhost:8090'
+
+  if (location.origin == api_origin) {
+    // do not index the search engine itself
+    return
+  }
+
   let blockedByCSP = false
   let retryBackoff = 5000
 
@@ -148,7 +155,7 @@
     })
     function upload() {
       if (blockedByCSP) return
-      fetch('http://localhost:8090/page', {
+      fetch(api_origin + '/page', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
