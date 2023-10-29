@@ -26,6 +26,7 @@ app.get('/search', (req, res) => {
 
 app.post('/page', (req, res) => {
   const page = req.body.page as Userscript.Page
+  page.url = decodeURI(page.url)
   const result = filterPage(page)
   if (result === 'skip') {
     log('skip page:', page.url)
