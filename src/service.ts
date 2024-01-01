@@ -49,7 +49,8 @@ storePage = db.transaction(storePage)
 const select_page_count = db.prepare(`select count(*) as count from page`)
 
 export function getPageCount() {
-  return select_page_count.get().count
+  let row = select_page_count.get() as { count: number }
+  return row.count
 }
 
 export function searchPage(keywords: string) {
@@ -68,7 +69,11 @@ export function searchPage(keywords: string) {
     rootPart = combineQueryPart(rootPart, queryPart)
   }
   rootPart.sql += ` order by timestamp desc`
-  return db.prepare(rootPart.sql).all(...rootPart.bindings)
+  return db.prepare(rootPart.sql).all(...rootPart.bindings) as {
+    id: number
+    url: string
+    title: string
+  }[]
 }
 
 export let deletePages = (page_id_list: string[]) => {
