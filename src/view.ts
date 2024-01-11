@@ -12,52 +12,7 @@ function startHTML(res: Response, title: string) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-</head>
-<body>
-  `)
-}
-
-function endHTML(res: Response) {
-  res.write(/* html */ `</body></html>`)
-  res.end()
-}
-
-export function renderSearchPage(res: Response, keyword?: any) {
-  const pages = typeof keyword === 'string' ? searchPage(keyword) : null
-  const title = pages ? 'Search: ' + keyword : 'Personal Search Engine'
-
-  startHTML(res, title)
-
-  res.write(/* html */ `
-<h1>${name} v${version}</h1>
-<p>total page count: ${getPageCount()}</p>
-
-<form id="search-form" action='/search' method='GET'>
-  <label>keyword:</label>
-  <input type='text' name='q'>
-  <script>
-      let params = new URLSearchParams(location.search)
-      let q = params.get('q')
-      if (q) {
-        let form = document.querySelector('form')
-        form.q.value = q
-      }
-  </script>
-  <input type='submit' value="Search">
-  `)
-  if (pages) {
-    res.write(/* html */ `
-  <div>${pages.length.toLocaleString()} matches</div>
-    `)
-  }
-  res.write(/* html */ `
-</form>
-`)
-
-  if (pages && pages.length > 0) {
-    const padding = pages[0].id.toString().length / 2 + 1
-    res.write(/* html */ `
-<style>
+    <style>
 body {
   font-family: Sans-serif;
 }
@@ -109,7 +64,52 @@ li > div {
 }
 .checkbox-wrapper {
 }
-</style>
+    </style>
+</head>
+<body>
+  `)
+}
+
+function endHTML(res: Response) {
+  res.write(/* html */ `</body></html>`)
+  res.end()
+}
+
+export function renderSearchPage(res: Response, keyword?: any) {
+  const pages = typeof keyword === 'string' ? searchPage(keyword) : null
+  const title = pages ? 'Search: ' + keyword : 'Personal Search Engine'
+
+  startHTML(res, title)
+
+  res.write(/* html */ `
+<h1>${name} v${version}</h1>
+<p>total page count: ${getPageCount()}</p>
+
+<form id="search-form" action='/search' method='GET'>
+  <label>keyword:</label>
+  <input type='text' name='q'>
+  <script>
+      let params = new URLSearchParams(location.search)
+      let q = params.get('q')
+      if (q) {
+        let form = document.querySelector('form')
+        form.q.value = q
+      }
+  </script>
+  <input type='submit' value="Search">
+  `)
+  if (pages) {
+    res.write(/* html */ `
+  <div>${pages.length.toLocaleString()} matches</div>
+    `)
+  }
+  res.write(/* html */ `
+</form>
+`)
+
+  if (pages && pages.length > 0) {
+    const padding = pages[0].id.toString().length / 2 + 1
+    res.write(/* html */ `
 <script>
 function checkAll(checked) {
   document.querySelectorAll('form .checkbox-wrapper input').forEach(input => {
