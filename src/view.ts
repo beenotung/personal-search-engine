@@ -116,11 +116,37 @@ function checkAll(checked) {
     input.checked = checked
   })
 }
+let rangeFrom = ''
+let rangeTo = ''
+function checkByRange() {
+  let from = +prompt('Select range inclusively from id: ', rangeFrom)
+  if (from) {
+    rangeFrom = from
+  }
+  let to = +prompt('Select range inclusively to id: ', rangeTo)
+  if (to) {
+    rangeTo = to
+  }
+  if (from < to) {
+    loop(from, to)
+  } else if (from > to) {
+    loop(to, from)
+  }
+  function loop(from, to) {
+    for (let i = from; i <= to; i++) {
+      let input = document.querySelector('form li[value="'+i+'"] .checkbox-wrapper input')
+      if (input) {
+        input.checked = true
+      }
+    }
+  }
+}
 </script>
 <form action="/delete" method="POST">
   <div id="controls">
-    <button onclick="checkAll(true); return false">Select All</button>
-    <button onclick="checkAll(false); return false">Unselect All</button>
+    <button type="button" onclick="checkAll(true)">Select All</button>
+    <button type="button" onclick="checkAll(false)">Unselect All</button>
+    <button type="button" onclick="checkByRange()">Select by Range</button>
     <input type="submit" value="Delete Selected" style="background: black; color: white">
   </div>
   <ol style="padding-inline-start: ${padding}em">`)
