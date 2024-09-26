@@ -116,6 +116,11 @@ function checkAll(checked) {
     input.checked = checked
   })
 }
+function toggleAll() {
+  document.querySelectorAll('form .checkbox-wrapper input').forEach(input => {
+    input.checked = !input.checked
+  })
+}
 let rangeFrom = ''
 let rangeTo = ''
 function checkByRange() {
@@ -146,6 +151,7 @@ function checkByRange() {
   <div id="controls">
     <button type="button" onclick="checkAll(true)">Select All</button>
     <button type="button" onclick="checkAll(false)">Unselect All</button>
+    <button type="button" onclick="toggleAll()">Toggle Selection</button>
     <button type="button" onclick="checkByRange()">Select by Range</button>
     <input type="submit" value="Delete Selected" style="background: black; color: white">
   </div>
