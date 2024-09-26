@@ -125,16 +125,16 @@ let rangeFrom = ''
 let rangeTo = ''
 function checkByRange() {
   let from = +prompt('Select range inclusively from id: ', rangeFrom)
-  if (from) {
-    rangeFrom = from
-  }
+  if (!from) return
+  rangeFrom = from
+
   let to = +prompt('Select range inclusively to id: ', rangeTo)
-  if (to) {
-    rangeTo = to
-  }
+  if (!to) return
+  rangeTo = to
+
   if (from < to) {
     loop(from, to)
-  } else if (from > to) {
+  } else {
     loop(to, from)
   }
   function loop(from, to) {
