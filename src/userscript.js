@@ -103,8 +103,9 @@
         return meta
       })
 
-    let body = document.createElement('body')
-    body.innerHTML = document.body.innerHTML
+    let parser = new DOMParser()
+    let doc = parser.parseFromString(document.body.outerHTML, 'text/html')
+    let body = doc.body
 
     urlMatchSkipSelectorList.forEach(
       ([urlMatch, selectorList]) =>
